@@ -68,6 +68,8 @@ plugins=(git fzf-tab ohmyzsh-full-autoupdate docker)
 
 source $ZSH/oh-my-zsh.sh
 
+# Uncomment the following line to enable command auto-correction.
+ENABLE_CORRECTION="true"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
