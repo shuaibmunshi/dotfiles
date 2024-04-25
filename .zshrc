@@ -102,6 +102,13 @@ if [ -x "$(command -v ansible-playbook)" ]; then
 fi
 
 if [ -x "$(command -v pyenv)" ]; then
+    echo "Configuring pyenv" >&2
     eval "$(pyenv init - | sed 's:^pyenv() :function pyenv():')" >&2
     export PATH=$(pyenv root)/shims:$PATH 
 fi
+
+if [ -x "$(command -v fzf)" ]; then
+    echo "Configuting fzf" >&2
+    eval "$(fzf --zsh)" >&2
+fi
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
