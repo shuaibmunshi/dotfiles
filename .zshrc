@@ -74,28 +74,34 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
+################
+# Alias Config #
+################
+echo "-----------------------------"
+echo "Configuring aliases..." >&2
+if [ -x "$(command -v git)" ]; then
+    echo "Alias: config='/usr/bin/git --git-dir=$HOME/repos/dotfiles/ --work-tree=$HOME'" >&2
+    alias config='/usr/bin/git --git-dir=$HOME/repos/dotfiles/ --work-tree=$HOME' >&2
+fi
 
-# export MANPATH="/usr/local/man:$MANPATH"
+if [ -f /usr/local/bin/code ]; then
+    if [ -x "$(command -v code)" ]; then
+        echo "Alias: code="/usr/local/bin/code"" >&2
+        alias code="/usr/local/bin/code" >&2
+    fi
+fi
 
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
+if [ -x "$(command -v caffeinate)" ]; then
+    echo "Alias: coffee="caffeinate"" >&2
+    alias coffee="caffeinate" >&2
+fi
 
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
+if [ -x "$(command -v ansible-playbook)" ]; then
+    echo "Alias: ap="ansible-playbook"" >&2
+    alias ap="ansible-playbook" >&2
+fi
 
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+if [ -x "$(command -v pyenv)" ]; then
+    eval "$(pyenv init - | sed 's:^pyenv() :function pyenv():')" >&2
+    export PATH=$(pyenv root)/shims:$PATH 
+fi
