@@ -37,6 +37,14 @@ if [ -x "$(command -v fzf)" ]; then
 fi
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+if [ -x "$(command -v kubectl)" ]; then
+    echo "source <(kubectl completion zsh)" >&2
+    source <(kubectl completion zsh) >&2
+
+    echo "Alias: k="kubectl"" >&2
+    alias k="kubectl" >&2
+fi
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -64,7 +72,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 
 source ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete 
 
-plugins=(git fzf-tab ohmyzsh-full-autoupdate docker)
+plugins=(git fzf-tab ohmyzsh-full-autoupdate docker kubectl)
 
 source $ZSH/oh-my-zsh.sh
 

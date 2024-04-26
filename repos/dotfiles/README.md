@@ -38,3 +38,8 @@ git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git ${Z
 config add $HOME/Library/Application\ Support/Code/User/settings.json
 code $HOME/Library/Application\ Support/Code/User/settings.json
 ```
+
+### Kubectl
+```
+brew install kubectl
+```
