@@ -54,4 +54,7 @@
     "[json]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "git.autofetch": true,
+    "markdown.validate.enabled": true,
+    "git.openRepositoryInParentFolders": "always",
 }

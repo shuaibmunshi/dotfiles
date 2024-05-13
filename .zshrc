@@ -45,6 +45,14 @@ if [ -x "$(command -v kubectl)" ]; then
     alias k="kubectl" >&2
 fi
 
+if [ -x "$(command -v nvim)" ]; then
+    echo "Configuring nvim" >&2
+    alias vi="nvim" >&2
+fi
+
+# https://docs.brew.sh/Shell-Completion
+FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -72,7 +80,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 
 source ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete 
 
-plugins=(git fzf-tab ohmyzsh-full-autoupdate docker kubectl)
+plugins=(git fzf-tab ohmyzsh-full-autoupdate docker kubectl zsh-fzf-history-search)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -109,3 +117,8 @@ setopt HIST_SAVE_NO_DUPS
 setopt SHARE_HISTORY
 # Execute commands using history (e.g.: using !$) immediatel:
 unsetopt HIST_VERIFY
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/shuaib/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/shuaib/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/shuaib/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/shuaib/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
