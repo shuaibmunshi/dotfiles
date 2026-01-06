@@ -1,67 +1,9 @@
-################
-# Alias Config #
-################
-echo "-----------------------------"
-echo "Configuring aliases..." >&2
-if [ -x "$(command -v git)" ]; then
-    echo "Alias: config='/usr/bin/git --git-dir=$HOME/repos/dotfiles/ --work-tree=$HOME'" >&2
-    alias config='/usr/bin/git --git-dir=$HOME/repos/dotfiles/ --work-tree=$HOME' >&2
-fi
-
-if [ -f /usr/local/bin/code ]; then
-    if [ -x "$(command -v code)" ]; then
-        echo "Alias: code="/usr/local/bin/code"" >&2
-        alias code="/usr/local/bin/code" >&2
-    fi
-fi
-
-if [ -x "$(command -v caffeinate)" ]; then
-    echo "Alias: coffee="caffeinate"" >&2
-    alias coffee="caffeinate" >&2
-fi
-
-if [ -x "$(command -v ansible-playbook)" ]; then
-    echo "Alias: ap="ansible-playbook"" >&2
-    alias ap="ansible-playbook" >&2
-fi
-
-if [ -x "$(command -v pyenv)" ]; then
-    echo "Configuring pyenv" >&2
-    eval "$(pyenv init - | sed 's:^pyenv() :function pyenv():')" >&2
-    export PATH=$(pyenv root)/shims:$PATH 
-fi
-
-if [ -x "$(command -v fzf)" ]; then
-    echo "Configuring fzf" >&2
-    eval "$(fzf --zsh)" >&2
-fi
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-if [ -x "$(command -v kubectl)" ]; then
-    echo "source <(kubectl completion zsh)" >&2
-    source <(kubectl completion zsh) >&2
-
-    echo "Alias: k="kubectl"" >&2
-    alias k="kubectl" >&2
-fi
-
-if [ -x "$(command -v nvim)" ]; then
-    echo "Configuring nvim" >&2
-    alias vi="nvim" >&2
-fi
-
-# https://docs.brew.sh/Shell-Completion
-FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
-
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -72,28 +14,17 @@ export ZSH="$HOME/.oh-my-zsh"
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
+# Uncomment the following line to enable command auto-correction.
+ENABLE_CORRECTION="true"
 
-# if [ -f ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/ohmyzsh-full-autoupdate/ohmyzsh-full-autoupdate.plugin.zsh ]; then
-#     echo "Installing ohmyzsh-full-autoupdate"
-#     git clone https://github.com/Pilaton/OhMyZsh-full-autoupdate.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/ohmyzsh-full-autoupdate
-# fi
-
-source ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete 
-
+# Plugins
 plugins=(git fzf-tab ohmyzsh-full-autoupdate docker kubectl zsh-fzf-history-search)
 
 source $ZSH/oh-my-zsh.sh
 
-# Uncomment the following line to enable command auto-correction.
-ENABLE_CORRECTION="true"
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
 ################
-#    HISTORY   #
+# HISTORY      #
 ################
-
 HISTFILE=$HOME/.zsh_history
 HISTSIZE=50000
 SAVEHIST=50000
@@ -115,10 +46,107 @@ setopt HIST_IGNORE_SPACE
 setopt HIST_SAVE_NO_DUPS
 # Share history between all sessions:
 setopt SHARE_HISTORY
-# Execute commands using history (e.g.: using !$) immediatel:
+# Execute commands using history (e.g.: using !$) immediately:
 unsetopt HIST_VERIFY
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/shuaib/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/shuaib/Downloads/google-cloud-sdk/path.zsh.inc'; fi
 
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/shuaib/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/shuaib/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+################
+# Completions  #
+################
+# Add deno completions to search path
+if [[ ":$FPATH:" != *":/home/shuaib/.zsh/completions:"* ]]; then
+  export FPATH="/home/shuaib/.zsh/completions:$FPATH"
+fi
+
+# macOS brew completions
+if [[ `uname` == "Darwin" ]]; then
+  # https://docs.brew.sh/Shell-Completion
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+fi
+
+fpath=(~/.zsh $fpath)
+
+# Optimize compinit - only rebuild cache once per day
+autoload -Uz compinit
+if [[ -n ${HOME}/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+
+################
+# PATH Setup   #
+################
+# Build PATH efficiently
+path=(
+  ${HOME}/.local/bin(N-/)
+  /usr/local/go/bin(N-/)
+  ${HOME}/go/bin(N-/)
+  ${HOME}/.cargo/bin(N-/)
+  ${HOME}/.claude/local(N-/)
+  $path
+)
+
+# Pyenv
+if (( $+commands[pyenv] )); then
+  export PATH="$(pyenv root)/shims:$PATH"
+  eval "$(pyenv init -)"
+fi
+
+export PATH
+
+################
+# Alias Config #
+################
+# Git dotfiles management
+(( $+commands[git] )) && alias config='/usr/bin/git --git-dir=$HOME/repos/dotfiles/ --work-tree=$HOME'
+
+# VS Code
+[[ -x /usr/local/bin/code ]] && alias code="/usr/local/bin/code"
+
+# Caffeinate (macOS)
+(( $+commands[caffeinate] )) && alias coffee="caffeinate"
+
+# Ansible
+(( $+commands[ansible-playbook] )) && alias ap="ansible-playbook"
+
+# Neovim
+(( $+commands[nvim] )) && alias vi="nvim"
+
+# Kubectl
+if (( $+commands[kubectl] )); then
+  source <(kubectl completion zsh)
+  alias k="kubectl"
+fi
+
+# Tailscale
+alias ts="tailscale status"
+
+# Claude
+alias claude="/home/shuaib/.claude/local/claude"
+
+################
+# Tool Configs #
+################
+# FZF
+if (( $+commands[fzf] )); then
+  eval "$(fzf --zsh)"
+fi
+
+# Zoxide (replaces cd)
+if (( $+commands[zoxide] )); then
+  eval "$(zoxide init --cmd cd zsh)"
+fi
+
+# Google Cloud SDK (update paths if needed)
+# if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then
+#   . "$HOME/google-cloud-sdk/path.zsh.inc"
+# fi
+# if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then
+#   . "$HOME/google-cloud-sdk/completion.zsh.inc"
+# fi
+
+# Local environment variables
+[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
